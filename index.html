@@ -84,21 +84,26 @@
       <div class="flex items-center gap-2.5">
         <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-mono font-semibold flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-          NO-CODE ADMIN MODE ACTIVE
+          OWNER ADMIN MODE UNLOCKED
         </span>
-        <span class="text-slate-300 hidden sm:inline">Click any <strong>"Edit"</strong> or <strong>"+ Add"</strong> button on the page to update your site without touching code.</span>
+        <span class="text-slate-300 hidden lg:inline">Visitors cannot see this bar. Click any <strong>"Edit"</strong> or <strong>"+ Add"</strong> button below to update your site.</span>
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <button onclick="openFullCmsModal()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-all flex items-center gap-1.5 shadow">
           <i class="fa-solid fa-sliders"></i>
           <span>All Site Settings</span>
         </button>
-        <button onclick="downloadUpdatedHtmlFile()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-all flex items-center gap-1.5 shadow" title="Download this complete HTML file with all your manual edits saved inside for your domain">
-          <i class="fa-solid fa-download"></i>
-          <span>Download Updated Site (.html)</span>
+        <button onclick="openChangePasswordModal()" class="px-3 py-1.5 rounded-lg bg-amber-600/90 hover:bg-amber-500 text-white font-medium transition-all flex items-center gap-1.5 shadow" title="Change your secret Admin Password">
+          <i class="fa-solid fa-key"></i>
+          <span>Change Password</span>
         </button>
-        <button onclick="toggleAdminMode()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all">
-          Exit Admin
+        <button onclick="downloadUpdatedHtmlFile()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium transition-all flex items-center gap-1.5 shadow" title="Download clean public HTML file with all your edits saved and Admin locked">
+          <i class="fa-solid fa-download"></i>
+          <span>Download Clean Public Website (.html)</span>
+        </button>
+        <button onclick="logoutAdminMode()" class="px-3 py-1.5 rounded-lg bg-rose-950/80 hover:bg-rose-900 text-rose-200 border border-rose-700/50 transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-lock"></i>
+          <span>Lock &amp; Logout</span>
         </button>
       </div>
     </div>
@@ -148,22 +153,16 @@
           </button>
         </nav>
 
-        <!-- Right Controls: No-Code Admin Toggle & Contact Button -->
+        <!-- Right Controls: Clean Public Call-to-Action Only -->
         <div class="hidden md:flex items-center gap-3">
-          <button id="admin-toggle-btn" onclick="toggleAdminMode()" class="px-3.5 py-2 rounded-xl text-xs font-mono font-medium bg-slate-900 hover:bg-slate-800 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-2" title="Turn on No-Code Editor to customize any text, app, or detail manually">
-            <i class="fa-solid fa-pen-to-square"></i>
-            <span id="admin-toggle-label">Edit Site (CMS)</span>
-          </button>
-          <button onclick="navigateTo('details')" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-500/20 transition-all">
-            Contact Us
+          <button onclick="navigateTo('details')" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center gap-2">
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+            <span>Contact Us</span>
           </button>
         </div>
 
-        <!-- Mobile Menu & Admin Trigger -->
+        <!-- Mobile Menu Trigger Only (No Public CMS Button) -->
         <div class="flex items-center gap-2 md:hidden">
-          <button onclick="toggleAdminMode()" class="px-3 py-2 rounded-xl text-xs font-mono bg-slate-900 border border-cyan-500/40 text-cyan-300">
-            <i class="fa-solid fa-pen-to-square mr-1"></i>CMS
-          </button>
           <button onclick="toggleMobileDrawer()" aria-label="Menu" class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200">
             <i id="mobile-drawer-icon" class="fa-solid fa-bars text-lg"></i>
           </button>
@@ -230,10 +229,11 @@
         <p>© <span id="footer-year">2026</span> <strong id="footer-copy-name" class="text-slate-200">Sayanta Technologies</strong>. All rights reserved.</p>
         <div class="flex items-center gap-4">
           <span id="sync-status-indicator" class="font-mono text-[11px] text-emerald-400 flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Ready
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Official Portal
           </span>
-          <button onclick="toggleAdminMode()" class="text-cyan-400 hover:underline font-mono">
-            <i class="fa-solid fa-sliders mr-1"></i>Manage Site Content
+          <button id="footer-admin-lock-btn" onclick="handleAdminAccessClick()" class="text-slate-500 hover:text-slate-300 transition-colors font-mono text-[11px] flex items-center gap-1.5" title="Owner Admin Login (Shortcut: Ctrl+Shift+A)">
+            <i class="fa-solid fa-lock text-[10px]"></i>
+            <span>Owner Login</span>
           </button>
         </div>
       </div>
@@ -264,9 +264,13 @@
        DEFAULT SITE DATA & CLOUD / LOCAL CMS ENGINE
        ========================================================= -->
   <script id="sayanta-default-data-script">
-    // Default data structure. When you click "Download Updated Site (.html)",
-    // your latest manual edits are automatically baked right here!
+    // Default data structure. When you click "Download Clean Public Website (.html)",
+    // your latest manual edits & custom password are automatically baked right here!
     window.DEFAULT_SITE_DATA = {
+      security: {
+        adminPassword: "sayanta2026",
+        passwordChanged: false
+      },
       brand: {
         companyName: "Sayanta Technologies",
         logoInitials: "ST",
@@ -783,12 +787,6 @@
                 </button>
               `).join('')}
             </div>
-
-            ${!isAdminMode ? `
-              <button onclick="toggleAdminMode()" class="text-xs font-mono text-cyan-400 hover:underline">
-                <i class="fa-solid fa-pen-to-square mr-1"></i>Want to add or edit your apps? Turn on Edit Mode
-              </button>
-            ` : ''}
           </div>
 
           <!-- Apps Grid -->
@@ -796,10 +794,12 @@
             <div class="rounded-3xl bg-slate-900/50 border border-slate-800 p-12 text-center space-y-4">
               <i class="fa-solid fa-layer-group text-3xl text-slate-500"></i>
               <h3 class="font-display font-bold text-lg text-white">No items in "${currentAppFilter}" yet</h3>
-              <p class="text-sm text-slate-400">You can add your own websites or mobile apps anytime using the No-Code Editor.</p>
-              <button onclick="if(!isAdminMode) toggleAdminMode(); openAppFormModal();" class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white">
-                + Add Your First App / Website
-              </button>
+              <p class="text-sm text-slate-400">New websites and applications from ${escapeHtml(siteData.brand.companyName)} will appear here soon.</p>
+              ${isAdminMode ? `
+                <button onclick="openAppFormModal()" class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 text-white">
+                  + Add Your First App / Website
+                </button>
+              ` : ''}
             </div>
           ` : `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -963,11 +963,15 @@
             <div class="lg:col-span-6 admin-editable-box rounded-3xl bg-slate-900/75 border border-slate-800 p-6 sm:p-8 space-y-5">
               <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                 <h2 class="font-display font-bold text-xl text-white">Company Profile</h2>
-                ${!isAdminMode ? `
-                  <button onclick="toggleAdminMode(); openEditDetailsModal();" class="text-xs font-mono text-cyan-400 hover:underline">
+                ${isAdminMode ? `
+                  <button onclick="openEditDetailsModal()" class="text-xs font-mono text-cyan-400 hover:underline">
                     <i class="fa-solid fa-pen mr-1"></i>Edit Details
                   </button>
-                ` : ''}
+                ` : `
+                  <span class="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-check"></i> Verified Details
+                  </span>
+                `}
               </div>
 
               <div class="space-y-3.5 text-sm">
@@ -1078,28 +1082,182 @@
     }
 
     // =========================================================
-    // NO-CODE ADMIN MODE & VISUAL EDITOR FORMS
+    // SECURE OWNER ADMIN AUTHENTICATION & VISUAL EDITOR FORMS
     // =========================================================
-    window.toggleAdminMode = function() {
-      isAdminMode = !isAdminMode;
+    function ensureSecurityConfig() {
+      if (!siteData.security) {
+        siteData.security = {
+          adminPassword: "sayanta2026",
+          passwordChanged: false
+        };
+      }
+    }
+
+    // Triggered by discrete footer lock icon or Ctrl+Shift+A
+    window.handleAdminAccessClick = function() {
+      if (isAdminMode) {
+        openFullCmsModal();
+      } else {
+        openAdminLoginModal();
+      }
+    };
+
+    window.openAdminLoginModal = function() {
+      ensureSecurityConfig();
+      const isDefaultPwd = !siteData.security.passwordChanged;
+
+      openEditorModal('Owner Admin Authentication', `
+        <form onsubmit="verifyAdminLogin(event)" class="space-y-5 text-sm">
+          <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-start gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5">
+              <i class="fa-solid fa-user-shield text-lg"></i>
+            </div>
+            <div>
+              <h4 class="font-display font-semibold text-white text-base">Restricted to Sayanta Technologies Owner</h4>
+              <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                Public visitors can only view the website. Enter your secret Admin Password below to unlock No-Code editing across all 5 pages.
+              </p>
+            </div>
+          </div>
+
+          ${isDefaultPwd ? `
+            <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-1">
+              <div class="font-mono font-semibold text-amber-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>First-Time Owner Setup Helper</span>
+              </div>
+              <p class="text-slate-300">
+                Your initial default password is <code class="px-1.5 py-0.5 rounded bg-slate-950 text-cyan-300 font-mono">sayanta2026</code>. Once you log in and change your password in <strong>Change Password</strong>, this helper message will disappear permanently.
+              </p>
+            </div>
+          ` : ''}
+
+          <div>
+            <label class="block text-xs font-mono uppercase text-slate-300 mb-2">Enter Admin Password *</label>
+            <div class="relative">
+              <input type="password" id="admin-login-password-input" required autofocus placeholder="Enter your secret password..." class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-cyan-400" />
+            </div>
+            <p id="admin-login-error" class="hidden text-xs text-rose-400 font-mono mt-2">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i> Incorrect password. Access denied.
+            </p>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <span class="text-[11px] font-mono text-slate-500">Shortcut: Ctrl + Shift + A</span>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="closeEditorModal()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300">Cancel</button>
+              <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-semibold shadow-lg">
+                <i class="fa-solid fa-unlock-keyhole mr-1.5"></i> Unlock Admin Mode
+              </button>
+            </div>
+          </div>
+        </form>
+      `);
+    };
+
+    window.verifyAdminLogin = function(e) {
+      e.preventDefault();
+      ensureSecurityConfig();
+      const entered = document.getElementById('admin-login-password-input').value;
+      const errEl = document.getElementById('admin-login-error');
+
+      if (entered === siteData.security.adminPassword) {
+        closeEditorModal();
+        setAdminModeState(true);
+        showToast('Owner Authenticated! Admin Edit Mode is now unlocked.', 'success');
+      } else {
+        if (errEl) errEl.classList.remove('hidden');
+      }
+    };
+
+    window.logoutAdminMode = function() {
+      setAdminModeState(false);
+      closeEditorModal();
+      showToast('Admin Mode locked. Website is now in standard Public Visitor view.', 'info');
+    };
+
+    function setAdminModeState(active) {
+      isAdminMode = active;
       const topbar = document.getElementById('admin-topbar');
-      const btnLabel = document.getElementById('admin-toggle-label');
-      const toggleBtn = document.getElementById('admin-toggle-btn');
+      const footerLockBtn = document.getElementById('footer-admin-lock-btn');
 
       if (isAdminMode) {
         document.body.classList.add('admin-mode');
         topbar.classList.remove('hidden');
-        if (btnLabel) btnLabel.textContent = 'Admin Mode: ON';
-        if (toggleBtn) toggleBtn.className = 'px-3.5 py-2 rounded-xl text-xs font-mono font-semibold bg-cyan-500 text-slate-950 shadow-lg shadow-cyan-500/25 transition-all flex items-center gap-2';
-        showToast('No-Code Admin Mode ON! Click any "Edit" or "+ Add" button to customize your site.', 'info');
+        if (footerLockBtn) {
+          footerLockBtn.className = 'text-cyan-400 hover:underline font-mono text-[11px] flex items-center gap-1.5';
+          footerLockBtn.innerHTML = '<i class="fa-solid fa-sliders"></i><span>Admin CMS (Unlocked)</span>';
+        }
       } else {
         document.body.classList.remove('admin-mode');
         topbar.classList.add('hidden');
-        if (btnLabel) btnLabel.textContent = 'Edit Site (CMS)';
-        if (toggleBtn) toggleBtn.className = 'px-3.5 py-2 rounded-xl text-xs font-mono font-medium bg-slate-900 hover:bg-slate-800 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-2';
-        showToast('Exited Admin Mode.', 'info');
+        if (footerLockBtn) {
+          footerLockBtn.className = 'text-slate-500 hover:text-slate-300 transition-colors font-mono text-[11px] flex items-center gap-1.5';
+          footerLockBtn.innerHTML = '<i class="fa-solid fa-lock text-[10px]"></i><span>Owner Login</span>';
+        }
       }
       renderCurrentPage();
+    }
+
+    // CHANGE ADMIN PASSWORD MODAL
+    window.openChangePasswordModal = function() {
+      if (!isAdminMode) {
+        openAdminLoginModal();
+        return;
+      }
+      ensureSecurityConfig();
+      openEditorModal('Change Owner Admin Password', `
+        <form onsubmit="saveNewAdminPassword(event)" class="space-y-4 text-sm">
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Set your own private Admin Password below. Once saved, the first-time setup hint is permanently removed and only your new password will unlock the CMS.
+          </p>
+          <div>
+            <label class="block text-xs font-mono text-slate-400 mb-1">Current Admin Password *</label>
+            <input type="password" id="pwd-current" required placeholder="Enter current password" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white" />
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-400 mb-1">New Secret Password *</label>
+            <input type="password" id="pwd-new" required minlength="4" placeholder="Enter new password (min 4 characters)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white" />
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-400 mb-1">Confirm New Password *</label>
+            <input type="password" id="pwd-confirm" required minlength="4" placeholder="Re-enter new password" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white" />
+          </div>
+          <p id="pwd-change-error" class="hidden text-xs font-mono text-rose-400"></p>
+          <div class="flex justify-end gap-3 pt-2">
+            <button type="button" onclick="closeEditorModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300">Cancel</button>
+            <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold">
+              <i class="fa-solid fa-key mr-1.5"></i>Save New Password
+            </button>
+          </div>
+        </form>
+      `);
+    };
+
+    window.saveNewAdminPassword = function(e) {
+      e.preventDefault();
+      ensureSecurityConfig();
+      const cur = document.getElementById('pwd-current').value;
+      const nw = document.getElementById('pwd-new').value;
+      const cf = document.getElementById('pwd-confirm').value;
+      const errEl = document.getElementById('pwd-change-error');
+
+      if (cur !== siteData.security.adminPassword) {
+        errEl.textContent = 'Current password is incorrect.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (nw !== cf) {
+        errEl.textContent = 'New passwords do not match.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      siteData.security.adminPassword = nw;
+      siteData.security.passwordChanged = true;
+      closeEditorModal();
+      saveSiteData(false);
+      showToast('Admin password updated! Remember to click "Download Clean Public Website (.html)" to update your domain file.', 'success');
     };
 
     function openEditorModal(title, bodyHtml) {
@@ -1481,10 +1639,14 @@
 
     // 7. CENTRALIZED ALL-IN-ONE CMS HUB MODAL
     window.openFullCmsModal = function() {
-      openEditorModal('All-In-One Site Manager (No-Code CMS)', `
+      if (!isAdminMode) {
+        openAdminLoginModal();
+        return;
+      }
+      openEditorModal('All-In-One Site Manager (Owner CMS)', `
         <div class="space-y-5 text-sm">
           <p class="text-slate-300">
-            Choose what you want to edit or export below. Every change updates your website immediately without touching code.
+            Choose what you want to edit or export below. Regular website visitors cannot access this panel.
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button onclick="openEditDetailsModal()" class="p-4 rounded-2xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left flex items-center gap-3">
@@ -1522,12 +1684,22 @@
                 <span class="text-xs text-slate-400">Add a step to Our History</span>
               </div>
             </button>
-            <button onclick="downloadUpdatedHtmlFile()" class="p-4 rounded-2xl bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-500/40 text-left flex items-center gap-3">
-              <i class="fa-solid fa-download text-emerald-400 text-xl"></i>
+            <button onclick="openChangePasswordModal()" class="p-4 rounded-2xl bg-slate-950 hover:bg-slate-800 border border-amber-500/30 text-left flex items-center gap-3">
+              <i class="fa-solid fa-key text-amber-400 text-xl"></i>
               <div>
-                <strong class="text-white block">Download Ready HTML File</strong>
-                <span class="text-xs text-emerald-300">For uploading to your domain</span>
+                <strong class="text-white block">Change Admin Password</strong>
+                <span class="text-xs text-slate-400">Update your secret owner password</span>
               </div>
+            </button>
+            <button onclick="downloadUpdatedHtmlFile()" class="sm:col-span-2 p-4 rounded-2xl bg-emerald-950/50 hover:bg-emerald-900/60 border border-emerald-500/40 text-left flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-download text-emerald-400 text-xl"></i>
+                <div>
+                  <strong class="text-white block">Download Clean Public Website (.html)</strong>
+                  <span class="text-xs text-emerald-300">Exports index.html with Admin locked &amp; all your edits baked in for your domain</span>
+                </div>
+              </div>
+              <i class="fa-solid fa-arrow-right text-emerald-400"></i>
             </button>
           </div>
         </div>
@@ -1563,11 +1735,12 @@
 
     // --- 9. EXPORT / DOWNLOAD UPDATED HTML FILE FOR DOMAIN HOSTING ---
     window.downloadUpdatedHtmlFile = function() {
-      // Ensure admin bar is closed in the exported snapshot
+      // Lock Admin Mode & close modals before taking the HTML snapshot so public visitors never see Admin UI
       const wasAdmin = isAdminMode;
-      if (wasAdmin) window.toggleAdminMode();
+      closeEditorModal();
+      if (wasAdmin) setAdminModeState(false);
 
-      // Bake the user's current siteData directly into the script tag
+      // Bake the owner's current siteData (including updated password) directly into the script tag
       const dataScriptEl = document.getElementById('sayanta-default-data-script');
       if (dataScriptEl) {
         dataScriptEl.textContent = `\n    window.DEFAULT_SITE_DATA = ${JSON.stringify(siteData, null, 2)};\n  `;
@@ -1584,8 +1757,8 @@
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      if (wasAdmin) window.toggleAdminMode();
-      showToast('Downloaded index.html with all your manual edits! Upload this file to your domain host.', 'success');
+      if (wasAdmin) setAdminModeState(true);
+      showToast('Downloaded clean public index.html! Admin is locked for visitors and your edits are saved.', 'success');
     };
 
     // --- UTILITIES ---
@@ -1637,10 +1810,19 @@
       if (['home', 'about', 'apps', 'history', 'details'].includes(initialHash)) {
         currentPage = initialHash;
       }
+      ensureSecurityConfig();
       syncGlobalElements();
       updateNavButtons();
       renderCurrentPage();
       initDataEngine();
+
+      // Secret Owner Keyboard Shortcut: Ctrl + Shift + A (or Cmd + Shift + A)
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+          e.preventDefault();
+          window.handleAdminAccessClick();
+        }
+      });
     });
   </script>
 </body>
